@@ -20,9 +20,12 @@ steps:
       - --allow-unauthenticated
 
 substitutions:
-  _REGION: europe-west1
-  _REPOSITORY: hello-repo
+  _REGION: europe-north1
+  _REPOSITORY: bitbucket-repo
   _SERVICE_NAME: hello-service
 
 images:
   - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE_NAME}:$SHORT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
