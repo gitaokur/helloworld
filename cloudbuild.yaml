@@ -20,7 +20,7 @@ steps:
       - --allow-unauthenticated
 
 substitutions:
-  _REGION: europe-north1
+  _REGION: europe-west3
   _REPOSITORY: bitbucket-repo
   _SERVICE_NAME: hello-service
 
