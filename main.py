@@ -8,7 +8,7 @@ GAME_HTML = """
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Buton Oyunu</title>
+  <title>Seçim Zamanı</title>
   <style>
     * {
       box-sizing: border-box;
@@ -32,18 +32,18 @@ GAME_HTML = """
       border-radius: 1.5rem;
       background: rgba(15, 23, 42, 0.9);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-      max-width: 480px;
+      max-width: 520px;
       width: 100%;
     }
 
     h1 {
-      font-size: 1.8rem;
+      font-size: 2rem;
       margin-bottom: 0.75rem;
     }
 
     p.subtitle {
-      font-size: 0.95rem;
-      opacity: 0.8;
+      font-size: 1rem;
+      opacity: 0.9;
       margin-bottom: 1.5rem;
     }
 
@@ -55,8 +55,8 @@ GAME_HTML = """
     }
 
     .circle-btn {
-      width: 90px;
-      height: 90px;
+      width: 180px;   /* 2 katına çıkarıldı */
+      height: 180px;  /* 2 katına çıkarıldı */
       border-radius: 999px;
       border: none;
       cursor: pointer;
@@ -92,7 +92,7 @@ GAME_HTML = """
 
     .status {
       min-height: 1.5rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       font-weight: 600;
     }
 
@@ -105,33 +105,63 @@ GAME_HTML = """
     }
 
     .reset-info {
-      font-size: 0.8rem;
-      opacity: 0.7;
+      font-size: 0.85rem;
+      opacity: 0.75;
+      margin-bottom: 0.5rem;
     }
 
-    .highlight {
-      color: #38bdf8;
+    .scoreboard {
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid rgba(148, 163, 184, 0.3);
+      opacity: 0.9;
+    }
+
+    .scoreboard span {
+      display: inline-block;
+      margin: 0 0.35rem;
+    }
+
+    .score-label {
+      opacity: 0.8;
+    }
+
+    .score-value {
       font-weight: 600;
+    }
+
+    .highlight-plus {
+      color: #ef4444; /* kırmızı + */
+      font-weight: 700;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Butonu Seç 🎯</h1>
+    <h1>Seçim Zamanı</h1>
     <p class="subtitle">
-      3 butondan sadece <span class="highlight">birinde +</span> var, diğerlerinde <span class="highlight">-</span>.<br/>
-      Doğru butonu seçebilir misin?
+      <span class="highlight-plus">+’ı</span> bul.
     </p>
 
     <div class="buttons-wrapper">
-      <button class="circle-btn" data-index="0">1</button>
-      <button class="circle-btn" data-index="1">2</button>
-      <button class="circle-btn" data-index="2">3</button>
+      <button class="circle-btn" data-index="0">Kare</button>
+      <button class="circle-btn" data-index="1">Yuvarlak</button>
+      <button class="circle-btn" data-index="2">Üçgen</button>
     </div>
 
     <div id="status" class="status"></div>
     <div class="reset-info">
       Her seçimden sonra oyun otomatik olarak yeniden karışır 🔄
+    </div>
+
+    <div id="scoreboard" class="scoreboard">
+      <span class="score-label">Toplam Deneme:</span>
+      <span id="score-attempts" class="score-value">0</span> |
+      <span class="score-label">Doğru Tahmin:</span>
+      <span id="score-correct" class="score-value">0</span> |
+      <span class="score-label">Başarı Oranı:</span>
+      <span id="score-rate" class="score-value">0%</span>
     </div>
   </div>
 
@@ -139,7 +169,20 @@ GAME_HTML = """
     const buttons = document.querySelectorAll(".circle-btn");
     const statusEl = document.getElementById("status");
 
+    const attemptsEl = document.getElementById("score-attempts");
+    const correctEl = document.getElementById("score-correct");
+    const rateEl = document.getElementById("score-rate");
+
     let correctIndex = null;
+    let attempts = 0;
+    let correctCount = 0;
+
+    function updateScoreboard() {
+      attemptsEl.textContent = attempts;
+      correctEl.textContent = correctCount;
+      const rate = attempts === 0 ? 0 : Math.round((correctCount / attempts) * 100);
+      rateEl.textContent = rate + "%";
+    }
 
     function randomizeCorrectButton() {
       correctIndex = Math.floor(Math.random() * 3);
@@ -158,30 +201,38 @@ GAME_HTML = """
       const clickedBtn = event.currentTarget;
       const clickedIndex = Number(clickedBtn.dataset.index);
 
+      attempts += 1;
+
       buttons.forEach((btn) => {
         btn.disabled = true;
         btn.style.opacity = "0.75";
       });
 
       if (clickedIndex === correctIndex) {
+        correctCount += 1;
         clickedBtn.classList.add("correct");
         statusEl.textContent = "Tebrikler! Doğru butonu seçtin 🎉";
         statusEl.classList.add("success");
+        updateScoreboard();
+        alert("Tebrikler! Doğru seçtin 🎉");
       } else {
         clickedBtn.classList.add("wrong");
         statusEl.textContent = "Tekrar dene! 🙃";
         statusEl.classList.add("error");
+        updateScoreboard();
+        alert("Tekrar dene! 🙃");
       }
 
       setTimeout(() => {
         randomizeCorrectButton();
-      }, 1200);
+      }, 300);
     }
 
     buttons.forEach((btn) => {
       btn.addEventListener("click", handleClick);
     });
 
+    updateScoreboard();
     randomizeCorrectButton();
   </script>
 </body>
@@ -190,8 +241,8 @@ GAME_HTML = """
 
 @app.route("/")
 def game():
-  return GAME_HTML
+    return GAME_HTML
 
 if __name__ == "__main__":
-  port = int(os.environ.get("PORT", 8080))
-  app.run(host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
