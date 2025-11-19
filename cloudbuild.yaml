@@ -21,7 +21,7 @@ steps:
 
 substitutions:
   _REGION: europe-west3
-  _REPOSITORY: bitbucket-repo
+  _REPOSITORY: github-repo
   _SERVICE_NAME: hello-service
 
 images:
