@@ -8,7 +8,7 @@ GAME_HTML = """
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Seçim Zamanı</title>
+  <title>Bombadan Kurtul</title>
   <style>
     * {
       box-sizing: border-box;
@@ -41,26 +41,35 @@ GAME_HTML = """
       margin-bottom: 0.75rem;
     }
 
-    p.subtitle {
-      font-size: 1rem;
-      opacity: 0.9;
-      margin-bottom: 1.5rem;
+    .status {
+      min-height: 1.8rem;
+      margin-bottom: 1rem;
+      font-weight: 650;
+      font-size: 1.05rem;
+    }
+
+    .status.success {
+      color: #22c55e;
+    }
+
+    .status.error {
+      color: #f97316;
     }
 
     .buttons-wrapper {
       display: flex;
       justify-content: center;
       gap: 1.5rem;
-      margin: 1.5rem 0 1rem 0;
+      margin: 0.5rem 0 1rem 0;
     }
 
     .circle-btn {
-      width: 180px;   /* 2 katına çıkarıldı */
-      height: 180px;  /* 2 katına çıkarıldı */
+      width: 180px;
+      height: 180px;
       border-radius: 999px;
       border: none;
       cursor: pointer;
-      font-size: 1.2rem;
+      font-size: 3rem;  /* şekiller büyük gözüksün */
       font-weight: 600;
       background: #0f172a;
       color: #e5e7eb;
@@ -90,24 +99,11 @@ GAME_HTML = """
       background: #b91c1c;
     }
 
-    .status {
-      min-height: 1.5rem;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-    }
-
-    .status.success {
-      color: #22c55e;
-    }
-
-    .status.error {
-      color: #f97316;
-    }
-
     .reset-info {
       font-size: 0.85rem;
       opacity: 0.75;
       margin-bottom: 0.5rem;
+      margin-top: 0.5rem;
     }
 
     .scoreboard {
@@ -130,27 +126,22 @@ GAME_HTML = """
     .score-value {
       font-weight: 600;
     }
-
-    .highlight-plus {
-      color: #ef4444; /* kırmızı + */
-      font-weight: 700;
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Seçim Zamanı</h1>
-    <p class="subtitle">
-      <span class="highlight-plus">+’ı</span> bul.
-    </p>
+    <h1>Bombadan Kurtul</h1>
+
+    <!-- Mesaj artık butonların ÜSTÜNDE -->
+    <div id="status" class="status"></div>
 
     <div class="buttons-wrapper">
-      <button class="circle-btn" data-index="0">Kare</button>
-      <button class="circle-btn" data-index="1">Yuvarlak</button>
-      <button class="circle-btn" data-index="2">Üçgen</button>
+      <!-- Kare, Yuvarlak, Üçgen artık şekil olarak -->
+      <button class="circle-btn" data-index="0" aria-label="Kare">&#9632;</button>
+      <button class="circle-btn" data-index="1" aria-label="Yuvarlak">&#9679;</button>
+      <button class="circle-btn" data-index="2" aria-label="Üçgen">&#9650;</button>
     </div>
 
-    <div id="status" class="status"></div>
     <div class="reset-info">
       Her seçimden sonra oyun otomatik olarak yeniden karışır 🔄
     </div>
@@ -158,7 +149,7 @@ GAME_HTML = """
     <div id="scoreboard" class="scoreboard">
       <span class="score-label">Toplam Deneme:</span>
       <span id="score-attempts" class="score-value">0</span> |
-      <span class="score-label">Doğru Tahmin:</span>
+      <span class="score-label">Kurtulduğun Seçimler:</span>
       <span id="score-correct" class="score-value">0</span> |
       <span class="score-label">Başarı Oranı:</span>
       <span id="score-rate" class="score-value">0%</span>
@@ -173,9 +164,9 @@ GAME_HTML = """
     const correctEl = document.getElementById("score-correct");
     const rateEl = document.getElementById("score-rate");
 
-    let correctIndex = null;
+    let bombIndex = null;      // Bomba olan buton
     let attempts = 0;
-    let correctCount = 0;
+    let correctCount = 0;      // Kurtulduğun seçimler
 
     function updateScoreboard() {
       attemptsEl.textContent = attempts;
@@ -184,8 +175,8 @@ GAME_HTML = """
       rateEl.textContent = rate + "%";
     }
 
-    function randomizeCorrectButton() {
-      correctIndex = Math.floor(Math.random() * 3);
+    function randomizeBomb() {
+      bombIndex = Math.floor(Math.random() * 3);
 
       buttons.forEach((btn) => {
         btn.classList.remove("correct", "wrong");
@@ -208,24 +199,24 @@ GAME_HTML = """
         btn.style.opacity = "0.75";
       });
 
-      if (clickedIndex === correctIndex) {
+      if (clickedIndex === bombIndex) {
+        // BOMBA: kaybettin
+        clickedBtn.classList.add("wrong");
+        statusEl.textContent = "BOMBA 💣 | Tekrar dene!";
+        statusEl.classList.add("error");
+      } else {
+        // Kurtuldun: başarılı seçim
         correctCount += 1;
         clickedBtn.classList.add("correct");
-        statusEl.textContent = "Tebrikler! Doğru butonu seçtin 🎉";
+        statusEl.textContent = "KURTULDUN 🎉 | İyi seçim!";
         statusEl.classList.add("success");
-        updateScoreboard();
-        alert("Tebrikler! Doğru seçtin 🎉");
-      } else {
-        clickedBtn.classList.add("wrong");
-        statusEl.textContent = "Tekrar dene! 🙃";
-        statusEl.classList.add("error");
-        updateScoreboard();
-        alert("Tekrar dene! 🙃");
       }
 
+      updateScoreboard();
+
       setTimeout(() => {
-        randomizeCorrectButton();
-      }, 300);
+        randomizeBomb();
+      }, 700);
     }
 
     buttons.forEach((btn) => {
@@ -233,7 +224,7 @@ GAME_HTML = """
     });
 
     updateScoreboard();
-    randomizeCorrectButton();
+    randomizeBomb();
   </script>
 </body>
 </html>
