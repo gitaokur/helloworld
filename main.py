@@ -259,7 +259,7 @@ def yusuf2():
     return {"status": "f"}
 
 
-@app.route("/games")
+@app.route("/api/games")
 def game():
     return GAME_HTML
 
