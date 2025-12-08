@@ -234,16 +234,6 @@ GAME_HTML = """
 def health():
     return {"status": "ok"}
 
-
-@app.route("/api/2")
-def health():
-    return {"status": "success"}
-
-
-@app.route("/games/alperen")
-def health():
-    return {"tebrikler"}
-
 @app.route("/games")
 def game():
     return GAME_HTML
