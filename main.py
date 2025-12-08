@@ -234,6 +234,10 @@ GAME_HTML = """
 def health():
     return {"status": "ok"}
 
+@app.route("/api/saglik")
+def health():
+    return {"status": "success"}
+
 @app.route("/games")
 def game():
     return GAME_HTML
