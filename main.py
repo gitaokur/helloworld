@@ -230,6 +230,10 @@ GAME_HTML = """
 </html>
 """
 
+@app.route("/api/health")
+def health():
+    return {"status": "ok"}
+
 @app.route("/")
 def game():
     return GAME_HTML
