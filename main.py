@@ -235,11 +235,11 @@ def health():
     return {"status": "ok"}
 
 @app.route("/alperen/a")
-def health():
+def alperen():
     return {"status": "success"}
 
 @app.route("/yusuf/y")
-def health():
+def yusuf():
     return {"status": "full"}
 
 @app.route("/games")
