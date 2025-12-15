@@ -1,7 +1,39 @@
 import os
-from flask import Flask
+import json
+import logging
+from flask import Flask, request
 
 app = Flask(__name__)
+
+logging.basicConfig(level=logging.INFO)
+
+def get_client_ip(req):
+    # Cloudflare'ın gerçek ziyaretçi IP'si
+    cf_ip = req.headers.get("CF-Connecting-IP")
+    if cf_ip:
+        return cf_ip.strip()
+
+    # Proxy zinciri: "client, proxy1, proxy2"
+    xff = req.headers.get("X-Forwarded-For", "")
+    if xff:
+        return xff.split(",")[0].strip()
+
+    # fallback (çoğu zaman CF / LB IP'si olur)
+    return req.remote_addr
+
+@app.before_request
+def log_request():
+    payload = {
+        "client_ip": get_client_ip(request),
+        "path": request.path,
+        "method": request.method,
+        "user_agent": request.headers.get("User-Agent"),
+        "cf_ray": request.headers.get("CF-Ray"),
+        "xff": request.headers.get("X-Forwarded-For"),
+    }
+    logging.info(json.dumps(payload, ensure_ascii=False))
+
+
 
 GAME_HTML = """
 <!DOCTYPE html>
@@ -259,7 +291,7 @@ def yusuf2():
     return {"status": "f"}
 
 
-@app.route("/api/games")
+@app.route("api/games")
 def game():
     return GAME_HTML
 
