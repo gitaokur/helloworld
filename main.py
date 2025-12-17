@@ -38,7 +38,7 @@ TOKEN_HTML = """
   <script>
 
     const firebaseConfig = {
-      apiKey: ${{ secrets.API_KEY }},
+      apiKey: "${{ secrets.API_KEY }}",
       authDomain: "alperenokur-sandbox-415013.firebaseapp.com",
       projectId: "alperenokur-sandbox-415013",
     };
