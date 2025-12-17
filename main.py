@@ -1,7 +1,9 @@
 import os
-from flask import Flask
+from flask import Flask, request, jsonify, make_response
 
 app = Flask(__name__)
+
+ALLOWED_ORIGIN = os.environ.get("CORS_ALLOWED_ORIGIN", "http://localhost:8080")
 
 GAME_HTML = """
 <!DOCTYPE html>
@@ -230,38 +232,71 @@ GAME_HTML = """
 </html>
 """
 
+# --- CORS MIDDLEWARE ---
+@app.after_request
+def add_cors_headers(response):
+    """
+    Her response'a CORS header'ları eklenir.
+    API Gateway üzerinden gelen browser çağrılarının
+    'Failed to fetch' hatasını çözmek için gerekli.
+    """
+    response.headers["Access-Control-Allow-Origin"] = ALLOWED_ORIGIN
+    response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    return response
+
+
+# --- API ENDPOINTLERİ ---
+
 @app.route("/api")
 def api():
-    return {"status": "Hello"}
+    return jsonify(status="Hello")
+
 
 @app.route("/api/saglik")
 def saglik():
-    return {"status": "OK"}
+    return jsonify(status="OK")
 
-@app.route("/api/health")
+
+@app.route("/api/health", methods=["GET", "OPTIONS"])
 def health():
-    return {"status": "ok"}
+    # Preflight isteği (OPTIONS) için boş 204 dön
+    if request.method == "OPTIONS":
+        return ("", 204)
+    return jsonify(status="ok")
+
 
 @app.route("/alperen/a")
 def alperen():
-    return {"status": "success"}
+    return jsonify(status="success")
+
 
 @app.route("/alperen/b")
 def alperen2():
-    return {"status": "b"}
+    return jsonify(status="b")
+
 
 @app.route("/yusuf/y")
 def yusuf():
-    return {"status": "full"}
+    return jsonify(status="full")
+
 
 @app.route("/yusuf/f")
 def yusuf2():
-    return {"status": "f"}
+    return jsonify(status="f")
 
 
-@app.route("/api/games")
+@app.route("/api/games", methods=["GET", "OPTIONS"])
 def game():
-    return GAME_HTML
+    # Preflight isteği (OPTIONS)
+    if request.method == "OPTIONS":
+        return ("", 204)
+
+    # HTML dönen endpoint (oyun sayfası)
+    resp = make_response(GAME_HTML)
+    resp.headers["Content-Type"] = "text/html; charset=utf-8"
+    return resp
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
