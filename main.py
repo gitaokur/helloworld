@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, make_response
 
 app = Flask(__name__)
 
-ALLOWED_ORIGIN = os.environ.get("CORS_ALLOWED_ORIGIN", "http://localhost:8080")
+CORS_ALLOWED_ORIGIN="https://alperenokur.com"
 
 GAME_HTML = """
 <!DOCTYPE html>
