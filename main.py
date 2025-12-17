@@ -43,7 +43,7 @@ TOKEN_HTML = """
       projectId: "alperenokur-sandbox-415013",
     };
 
-    const gatewayBaseUrl = ""; 
+    const gatewayBaseUrl = "https://api-gateway-bomb-b9vfc0v7.ew.gateway.dev"; 
 
     // Firebase init
     firebase.initializeApp(firebaseConfig);
