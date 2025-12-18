@@ -38,7 +38,7 @@ TOKEN_HTML = """
   <script>
 
     const firebaseConfig = {
-      apiKey: "AIzaSyAvgt21K4zDYNIZC-bIv0GOjf4eDJLWxH8",
+      apiKey: "AIzaSyDCjR7ZS7pxW9o8LNnNKvMUqd6N_mWMcU4",
       authDomain: "alperenokur-sandbox-415013.firebaseapp.com",
       projectId: "alperenokur-sandbox-415013",
     };
